@@ -1024,7 +1024,12 @@ object MiMa extends AutoPlugin {
 
         // #20553 Tree flattening should be separate from Fusing
         ProblemFilters.exclude[MissingClassProblem]("akka.stream.Fusing$StructuralInfo"),
-        ProblemFilters.exclude[MissingClassProblem]("akka.stream.Fusing$StructuralInfo$")
+        ProblemFilters.exclude[MissingClassProblem]("akka.stream.Fusing$StructuralInfo$"),
+        
+        // #21645 durable distributed data
+        ProblemFilters.exclude[DirectMissingMethodProblem]("akka.cluster.ddata.WriteAggregator.props"),
+        ProblemFilters.exclude[DirectMissingMethodProblem]("akka.cluster.ddata.WriteAggregator.this"),
+        ProblemFilters.exclude[IncompatibleResultTypeProblem]("akka.cluster.ddata.Replicator.write")
       )
     )
   }
