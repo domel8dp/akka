@@ -26,7 +26,10 @@ object DurablePruningSpec extends MultiNodeConfig {
     akka.actor.provider = "cluster"
     akka.log-dead-letters-during-shutdown = off
     akka.cluster.distributed-data.durable.keys = ["*"]
-    akka.cluster.distributed-data.durable.lmdb.dir = target/DurablePruningSpec-${System.currentTimeMillis}-ddata
+    akka.cluster.distributed-data.durable.lmdb {
+      dir = target/DurablePruningSpec-${System.currentTimeMillis}-ddata
+      map-size = 10 MiB
+    }
     """)))
 
 }

@@ -102,9 +102,13 @@ object ReplicatorSettings {
  *   completing the pruning process of data associated with removed cluster nodes.
  *   The time measurement is stopped when any replica is unreachable, so it should
  *   be configured to worst case in a healthy cluster.
- * @param durableStoreProps Props for the durable store actor.
+ * @param durableStoreProps Props for the durable store actor,
+ *        the `Left` alternative is a tuple of fully qualified actor class name and
+ *        the config constructor parameter of that class,
+ *        the `Right` alternative is the `Props` of the actor.
  * @param durableKeys Keys that are durable. Prefix matching is supported by using
- *        `*` at the end of a key.
+ *        `*` at the end of a key. All entries can be made durable by including "*"
+ *        in the `Set`.
  */
 final class ReplicatorSettings(
   val role:                      Option[String],

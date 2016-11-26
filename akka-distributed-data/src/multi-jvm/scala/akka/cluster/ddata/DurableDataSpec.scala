@@ -27,8 +27,11 @@ final case class DurableDataSpecConfig(writeBehind: Boolean) extends MultiNodeCo
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.log-dead-letters-during-shutdown = off
     akka.cluster.distributed-data.durable.keys = ["durable*"]
-    akka.cluster.distributed-data.durable.lmdb.dir = target/DurableDataSpec-${System.currentTimeMillis}-ddata
-    akka.cluster.distributed-data.durable.lmdb.write-behind-interval = ${if (writeBehind) "200ms" else "off"}
+    akka.cluster.distributed-data.durable.lmdb {
+      dir = target/DurableDataSpec-${System.currentTimeMillis}-ddata
+      map-size = 10 MiB
+      write-behind-interval = ${if (writeBehind) "200ms" else "off"}
+    }
     akka.test.single-expect-default = 5s
     """))
 }
@@ -141,6 +144,10 @@ abstract class DurableDataSpec(multiNodeConfig: DurableDataSpecConfig)
         }
         r2 ! Get(KeyA, ReadLocal)
         expectMsgType[GetSuccess[GCounter]].dataValue.value.toInt should be(3)
+
+        watch(r2)
+        system.stop(r2)
+        expectTerminated(r2)
       }
 
       enterBarrierAfterTestStep()

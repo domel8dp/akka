@@ -49,7 +49,6 @@ class ReplicatorMessageSerializerSpec extends TestKit(ActorSystem(
 
   def checkSerialization(obj: AnyRef): Unit = {
     val blob = serializer.toBinary(obj)
-    println(s"# $obj => ${serializer.manifest(obj)}") // FIXME
     val ref = serializer.fromBinary(blob, serializer.manifest(obj))
     ref should be(obj)
   }

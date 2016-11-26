@@ -464,7 +464,11 @@ are configured with::
 
 Prefix matching is supported by using ``*`` at the end of a key.
 
-`LMDB <https://symas.com/products/lightning-memory-mapped-database/>`_ is the default storage implementation. It is 
+All entries can be made durable by specifying::
+
+  akka.cluster.distributed-data.durable.keys = ["*"]
+
+`LMDB <https://github.com/lmdbjava/lmdbjava/>`_ is the default storage implementation. It is 
 possible to replace that with another implementation by implementing the actor protocol described in 
 ``akka.cluster.ddata.DurableStore`` and defining the ``akka.cluster.distributed-data.durable.store-actor-class``
 property for the new implementation. 
@@ -479,15 +483,17 @@ The location of the files for the data is configured with::
   #    a directory.
   akka.cluster.distributed-data.lmdb.dir = "ddata"
 
-Making the data durable has of course a performance cost. By default, each udpate is flushed
-to disk before the ``UpdateSuccess`` reply is sent. For better performance, but with the risk of loosing 
+Making the data durable has of course a performance cost. By default, each update is flushed
+to disk before the ``UpdateSuccess`` reply is sent. For better performance, but with the risk of losing 
 the last writes if the JVM crashes, you can enable write behind mode. Changes are then accumulated during
 a time period before it is written to LMDB and flushed to disk. Enabling write behind is especially
 efficient when performing many writes to the same key, because it is only the last value for each key 
-that will be serialized and stored. The risk of loosing writes if the JVM crashes is small since the 
+that will be serialized and stored. The risk of losing writes if the JVM crashes is small since the 
 data is typically replicated to other nodes immediately according to the given ``WriteConsistency``.
 
-  akka.cluster.distributed-data.mapdb.commit-interval = 200 ms
+::
+
+  akka.cluster.distributed-data.lmdb.write-behind-interval = 200 ms
 
 Note that you should be prepared to receive ``WriteFailure`` as reply to an ``Update`` of a 
 durable entry if the data could not be stored for some reason. When enabling ``write-behind-interval``
