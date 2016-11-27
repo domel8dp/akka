@@ -47,8 +47,6 @@ import org.lmdbjava.Txn
  */
 object DurableStore {
 
-  Thread.sleep(10000)
-
   /**
    * Request to store an entry. It optionally contains a `StoreReply`, which
    * should be used to signal success or failure of the operation to the contained
@@ -158,11 +156,14 @@ final class LmdbDurableStore(config: Config) extends Actor with ActorLogging {
 
   def init: Receive = {
     case LoadAll ⇒
+      val t0 = System.nanoTime()
       val tx = env.txnRead()
       try {
         val iter = db.iterate(tx)
         try {
+          var n = 0
           val loadData = LoadData(iter.asScala.map { entry ⇒
+            n += 1
             val keyArray = Array.ofDim[Byte](entry.key.remaining)
             entry.key.get(keyArray)
             val key = new String(keyArray, ByteString.UTF_8)
@@ -174,6 +175,9 @@ final class LmdbDurableStore(config: Config) extends Actor with ActorLogging {
           if (loadData.data.nonEmpty)
             sender() ! loadData
           sender() ! LoadAllCompleted
+          if (log.isDebugEnabled)
+            log.debug("load all of [{}] entries took [{} ms]", n,
+              TimeUnit.NANOSECONDS.toMillis(System.nanoTime - t0))
           context.become(active)
         } finally {
           Try(iter.close())
