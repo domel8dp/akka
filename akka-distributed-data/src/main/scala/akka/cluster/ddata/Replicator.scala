@@ -909,10 +909,15 @@ final class Replicator(settings: ReplicatorSettings) extends Actor with ActorLog
       context.become(normalReceive)
       self ! FlushChanges
 
+    case GetReplicaCount ⇒
+      // 0 until durable data has been loaded, used by test
+      sender() ! ReplicaCount(0)
+
     case RemovedNodePruningTick | FlushChanges | GossipTick ⇒
-    // ignore gossip and replication when loading durable data
-    case _: Read | _: Write | _: Status | _: Gossip         ⇒
-    // ignore gossip and replication when loading durable data
+    // ignore scheduled ticks when loading durable data
+    case m @ (_: Read | _: Write | _: Status | _: Gossip) ⇒
+      // ignore gossip and replication when loading durable data
+      log.debug("ignoring message [{}] when loading durable data", m.getClass.getName)
   }
 
   val normalReceive: Receive = {
