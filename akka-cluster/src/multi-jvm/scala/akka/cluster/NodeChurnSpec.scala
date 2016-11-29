@@ -26,6 +26,9 @@ object NodeChurnMultiJvmSpec extends MultiNodeConfig {
 
   commonConfig(debugConfig(on = false).
     withFallback(ConfigFactory.parseString("""
+      akka.loglevel = DEBUG
+      akka.cluster.debug.verbose-heartbeat-logging = on
+
       akka.cluster.auto-down-unreachable-after = 1s
       akka.remote.log-frame-size-exceeding = 1200b
       akka.remote.artery.advanced {
