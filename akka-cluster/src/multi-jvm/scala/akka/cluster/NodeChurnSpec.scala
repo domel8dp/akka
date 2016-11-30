@@ -137,7 +137,8 @@ abstract class NodeChurnSpec
         }
         awaitRemoved(systems, n)
         enterBarrier("members-removed-" + n)
-        systems.foreach(_.terminate().await)
+        systems.foreach(s ⇒ TestKit.shutdownActorSystem(s, verifySystemShutdown = true))
+        enterBarrier("end-round-" + n)
         log.info("end of round-" + n)
         // log listener will send to testActor if payload size exceed configured log-frame-size-exceeding
         expectNoMsg(2.seconds)
