@@ -1155,6 +1155,8 @@ abstract class StressSpec
 
   "A cluster under stress" must {
 
+    if (isArteryEnabled) pending
+
     "log settings" taggedAs LongRunningTest in {
       if (infolog) {
         log.info("StressSpec JVM:\n{}", jvmInfo)
